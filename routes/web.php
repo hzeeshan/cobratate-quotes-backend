@@ -1,7 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Models\Quote;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GoogleController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +20,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/logout', function () {
+    Auth::logout();
+    return redirect('/dev');
+});
+
+Route::get('/dev', function () {
+    dd(Auth::check());
+});
 
 Route::get('/import-csv', function () {
     $file = storage_path('app/data/quotes.csv');
@@ -40,3 +50,6 @@ Route::get('/import-csv', function () {
 
     dd("Data imported successfully!");
 });
+
+Route::get('login/google', [GoogleController::class, 'redirectToProvider']);
+Route::get('login/google/callback', [GoogleController::class, 'handleProviderCallback']);

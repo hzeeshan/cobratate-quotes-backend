@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuotesController;
 
@@ -21,3 +22,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::get('/quotes-list', [QuotesController::class, 'index']);
+
+Route::middleware('web')->get('/check-logged-in', function () {
+    return response()->json(['loggedIn' => Auth::check()]);
+});
+
+Route::middleware('web')->get('/logout', function () {
+    Auth::logout();
+    return response()->json(['message' => 'Logged out successfully']);
+});
