@@ -4,6 +4,9 @@ use App\Models\Quote;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GoogleController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\LikesController;
+use App\Http\Controllers\QuotesController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -18,11 +21,6 @@ use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('welcome');
-});
-
-Route::get('/logout', function () {
-    Auth::logout();
-    return redirect('/dev');
 });
 
 Route::get('/dev', function () {
@@ -49,6 +47,28 @@ Route::get('/import-csv', function () {
     }
 
     dd("Data imported successfully!");
+});
+
+Route::prefix('api')->group(function () {
+
+    Route::get('/quotes-list', [QuotesController::class, 'index']);
+
+    Route::get('/check-logged-in', function () {
+        if (Auth::check()) {
+            $user = Auth::user();
+            return response()->json(['loggedIn' => true, 'user' => $user, 'csrfToken' => csrf_token()]);
+        } else {
+            return response()->json(['loggedIn' => false]);
+        }
+    });
+
+    Route::post('quotes/{quote}/like', [LikesController::class, 'store'])->name('quotes.like');
+    Route::delete('quotes/{quote}/unlike', [LikesController::class, 'destroy'])->name('quotes.unlike');
+
+    Route::get('/logout', function () {
+        Auth::logout();
+        return response()->json(['message' => 'Logged out successfully']);
+    });
 });
 
 Route::get('login/google', [GoogleController::class, 'redirectToProvider']);
