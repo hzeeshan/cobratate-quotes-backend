@@ -10,4 +10,9 @@ class Quote extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function likedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'quote_user');
+    }
 }
