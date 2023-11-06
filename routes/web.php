@@ -6,6 +6,9 @@ use App\Http\Controllers\GoogleController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\LikesController;
 use App\Http\Controllers\QuotesController;
+use App\Http\Controllers\UserController;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 
 /*
@@ -56,7 +59,12 @@ Route::prefix('api')->group(function () {
     Route::get('/check-logged-in', function () {
         if (Auth::check()) {
             $user = Auth::user();
-            return response()->json(['loggedIn' => true, 'user' => $user, 'csrfToken' => csrf_token()]);
+            return response()->json([
+                'loggedIn' => true,
+                'user' => $user,
+                'csrfToken' => csrf_token(),
+                'roles' => $user->roles->pluck('name')
+            ]);
         } else {
             return response()->json(['loggedIn' => false]);
         }
@@ -74,3 +82,30 @@ Route::prefix('api')->group(function () {
 
 Route::get('login/google', [GoogleController::class, 'redirectToProvider']);
 Route::get('login/google/callback', [GoogleController::class, 'handleProviderCallback']);
+
+Route::get('/assign-role', [UserController::class, 'assignRole']);
+
+Route::middleware(['role:admin'])->group(function () {
+    Route::get('/quote/{quote}', [QuotesController::class, 'show'])->name('quotes.show');
+    Route::post('/api/quotes', [QuotesController::class, 'store'])->name('quotes.store');
+    Route::put('/quote/{quote}', [QuotesController::class, 'update'])->name('quotes.update');
+    Route::delete('/quote/{quote}', [QuotesController::class, 'destroy'])->name('quotes.destroy');
+});
+
+
+/* ============== */
+
+Route::get('/create-role', function () {
+    // Create roles
+    $adminRole = Role::create(['name' => 'admin']);
+
+    // Create permissions
+    $manageUsers = Permission::create(['name' => 'manage users']);
+    $editQuotes = Permission::create(['name' => 'manage quotes']);
+
+    // Assign permissions to roles
+    $adminRole->givePermissionTo($manageUsers);
+    $adminRole->givePermissionTo($editQuotes);
+
+    dd('success ...');
+});
