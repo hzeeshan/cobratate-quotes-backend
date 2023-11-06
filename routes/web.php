@@ -64,6 +64,7 @@ Route::prefix('api')->group(function () {
 
     Route::post('quotes/{quote}/like', [LikesController::class, 'store'])->name('quotes.like');
     Route::delete('quotes/{quote}/unlike', [LikesController::class, 'destroy'])->name('quotes.unlike');
+    Route::get('/user/liked-quotes', [LikesController::class, 'likedQuotes']);
 
     Route::get('/logout', function () {
         Auth::logout();

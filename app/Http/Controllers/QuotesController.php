@@ -14,7 +14,7 @@ class QuotesController extends Controller
         $page = $request->get('page', 1);
         $pageSize = 10;
         sleep(1);
-        $quotes = Quote::skip(($page - 1) * $pageSize)->take($pageSize)->get();
+        $quotes = Quote::withCount('likedByUsers')->skip(($page - 1) * $pageSize)->take($pageSize)->get(); // Add the `withCount` method to get the number of likes
 
         // If the user is authenticated, augment each quote with the isLikedByUser property
         if (Auth::check()) {

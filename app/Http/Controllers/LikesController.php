@@ -21,7 +21,7 @@ class LikesController extends Controller
 
         Auth::user()->likedQuotes()->attach($quoteId);
 
-        return response()->json(['message' => 'Successfully liked the quote.']);
+        return response()->json(['success' => true, 'message' => 'Successfully liked the quote.']);
     }
 
     public function destroy($quoteId)
@@ -32,6 +32,17 @@ class LikesController extends Controller
 
         Auth::user()->likedQuotes()->detach($quoteId);
 
-        return response()->json(['message' => 'Successfully unliked the quote.']);
+        return response()->json(['success' => true, 'message' => 'Successfully unliked the quote.']);
+    }
+
+    public function likedQuotes(Request $request)
+    {
+        $user = Auth::user();
+
+        $likedQuotes = $user->likedQuotes()
+            ->with('likedByUsers:id,name')
+            ->get(['quotes.id', 'quotes.content', 'quotes.source', 'quotes.category']); // Prefix 'quotes.'
+
+        return response()->json($likedQuotes);
     }
 }
