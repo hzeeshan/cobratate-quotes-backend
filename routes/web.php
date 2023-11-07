@@ -55,6 +55,7 @@ Route::get('/import-csv', function () {
 Route::prefix('api')->group(function () {
 
     Route::get('/quotes-list', [QuotesController::class, 'index']);
+    Route::get('/quotes/search', [QuotesController::class, 'fetchSearchResults']);
 
     Route::get('/check-logged-in', function () {
         if (Auth::check()) {

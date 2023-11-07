@@ -101,4 +101,13 @@ class QuotesController extends Controller
             'message' => 'Quote deleted successfully',
         ]);
     }
+
+    function fetchSearchResults(Request $request)
+    {
+        $query = $request->input('query');
+
+        $results = Quote::where('content', 'like', '%' . $query . '%')->get();
+
+        return response()->json($results);
+    }
 }
