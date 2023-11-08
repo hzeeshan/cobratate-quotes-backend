@@ -1,14 +1,15 @@
 <?php
 
 use App\Models\Quote;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\GoogleController;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\LikesController;
-use App\Http\Controllers\QuotesController;
-use App\Http\Controllers\UserController;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 use Spatie\Permission\Models\Permission;
+use App\Http\Controllers\LikesController;
+use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\QuotesController;
+use App\Http\Controllers\ContactFormController;
 
 
 /*
@@ -79,6 +80,9 @@ Route::prefix('api')->group(function () {
         Auth::logout();
         return response()->json(['message' => 'Logged out successfully']);
     });
+
+    /* Contact */
+    Route::post('/contact-form', [ContactFormController::class, 'store']);
 });
 
 Route::get('login/google', [GoogleController::class, 'redirectToProvider']);
