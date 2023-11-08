@@ -97,6 +97,10 @@ Route::middleware(['role:admin'])->group(function () {
     Route::delete('/quote/{quote}', [QuotesController::class, 'destroy'])->name('quotes.destroy');
 });
 
+Route::get('/csrf-token', function () {
+    return csrf_token();
+});
+
 
 /* ============== */
 
