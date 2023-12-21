@@ -12,6 +12,7 @@ class QuotesController extends Controller
     public function index(Request $request)
     {
         $page = $request->get('page', 1);
+        $category = $request->get('category');
         $pageSize = 10;
         //sleep(1);
         $quotes = Quote::withCount('likedByUsers')
@@ -57,6 +58,7 @@ class QuotesController extends Controller
         // Update the quote with the validated data
         $quote->update([
             'content' => $data['content'],
+            'category_id' => empty($request->category) ? null : $request->category,
         ]);
 
         // Return a success response
@@ -78,8 +80,7 @@ class QuotesController extends Controller
         // Create a new quote with the validated data
         $quote = Quote::create([
             'content' => $data['content'],
-            // Set other fields if necessary
-            //'user_id' => Auth::id(), // Assuming you want to save the ID of the admin who created the quote
+            'category_id' => empty($request->category) ? null : $request->category,
         ]);
 
         // Return a success response

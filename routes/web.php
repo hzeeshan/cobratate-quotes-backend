@@ -9,8 +9,9 @@ use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\LikesController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\QuotesController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactFormController;
-
+use App\Models\Category;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,13 +32,30 @@ Route::get('/dev', function () {
     dd(Auth::check());
 });
 
+Route::get('insert-categories', function () {
+    $categories = [
+        ['id' => 1, 'name' => 'General'],
+        ['id' => 2, 'name' => 'Fitness'],
+    ];
+    foreach ($categories as $category) {
+        //print_r();
+        Category::create([
+            'id' => $category['id'],
+            'name' => $category['name'],
+            'createt_at' => now(),
+            'updated_at' => now(),
+
+        ]);
+    }
+});
+
 Route::get('/import-csv', function () {
-    $file = storage_path('app/data/quotes.csv');
+    $file = storage_path('app/data/cobratate_quotes_v_2.csv');
 
     $data = [];
 
     if (($handle = fopen($file, 'r')) !== false) {
-        while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+        while (($row = fgetcsv($handle, 0, ',')) !== false) {
             $data[] = $row[0]; // Since there's only one column, we can access it directly
         }
         fclose($handle);
@@ -57,6 +75,8 @@ Route::prefix('api')->group(function () {
 
     Route::get('/quotes-list', [QuotesController::class, 'index']);
     Route::get('/quotes/search', [QuotesController::class, 'fetchSearchResults']);
+
+    Route::get('/categories', [CategoryController::class, 'index']);
 
     Route::get('/check-logged-in', function () {
         if (Auth::check()) {
@@ -88,7 +108,7 @@ Route::prefix('api')->group(function () {
 Route::get('login/google', [GoogleController::class, 'redirectToProvider']);
 Route::get('login/google/callback', [GoogleController::class, 'handleProviderCallback']);
 
-Route::get('/assign-role', [UserController::class, 'assignRole']);
+
 
 Route::middleware(['role:admin'])->group(function () {
     Route::get('/quote/{quote}', [QuotesController::class, 'show'])->name('quotes.show');
@@ -118,3 +138,5 @@ Route::get('/create-role', function () {
 
     dd('success ...');
 });
+
+Route::get('/assign-role', [UserController::class, 'assignRole']);
