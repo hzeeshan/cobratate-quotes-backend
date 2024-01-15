@@ -16,7 +16,7 @@ class QuotesController extends Controller
         $pageSize = 10;
         //sleep(1);
         $quotes = Quote::withCount('likedByUsers')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->skip(($page - 1) * $pageSize)->take($pageSize)->get();
 
         // If the user is authenticated, augment each quote with the isLikedByUser property
