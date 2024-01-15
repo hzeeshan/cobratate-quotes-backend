@@ -73,22 +73,31 @@ class QuotesController extends Controller
     {
         // Validate the request data
         $data = $request->validate([
-            'content' => 'required|string|max:1000', // Example validation rules
-            // Add other fields if necessary
+            'content' => 'required|string|max:1000',
         ]);
 
         // Create a new quote with the validated data
-        $quote = Quote::create([
-            'content' => $data['content'],
-            'category_id' => empty($request->category) ? null : $request->category,
-        ]);
+        $quote = Quote::firstOrCreate(
+            ['content' => $data['content']],
+            [
+                'content' => $data['content'],
+                'category_id' => empty($request->category) ? null : $request->category,
 
-        // Return a success response
-        return response()->json([
-            'success' => true,
-            'message' => 'Quote saved successfully',
-            'quote' => $quote,
-        ], 201);
+            ]
+        );
+
+        if ($quote->wasRecentlyCreated) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Quote saved successfully',
+                'quote' => $quote,
+            ], 201);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'This quote already exists',
+            ], 409);
+        }
     }
 
     public function destroy(Quote $quote)

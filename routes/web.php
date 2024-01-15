@@ -49,23 +49,36 @@ Route::get('insert-categories', function () {
     }
 });
 
-Route::get('/import-csv', function () {
-    $file = storage_path('app/data/cobratate_quotes_v_2.csv');
+Route::get('/import-csv-data', function () {
+    $file = storage_path('app/data/data.csv');
 
-    $data = [];
-
+    // Open the file
     if (($handle = fopen($file, 'r')) !== false) {
-        while (($row = fgetcsv($handle, 0, ',')) !== false) {
-            $data[] = $row[0]; // Since there's only one column, we can access it directly
-        }
-        fclose($handle);
-    }
+        // Skip the header row
+        fgetcsv($handle, 0, ',');
 
-    // Insert data into the database
-    foreach ($data as $quoteContent) {
-        Quote::create([
-            'content' => $quoteContent,
-        ]);
+        // Read each line of the CSV
+        while (($row = fgetcsv($handle, 0, ',')) !== false) {
+            // Assuming the CSV columns are in the order: id, content, category_id, source, created_at, updated_at
+            // Since 'id' is auto-incremented, we don't need to import it
+            $content = $row[1];
+            $categoryId = $row[2] === 'NULL' ? null : $row[2]; // Convert 'NULL' string to actual null
+            $source = $row[3] === 'NULL' ? null : $row[3]; // Convert 'NULL' string to actual null
+            $createdAt = $row[4];
+            $updatedAt = $row[5];
+
+            // Insert data into the database
+            Quote::create([
+                'content' => $content,
+                'category_id' => $categoryId,
+                'source' => $source,
+                'created_at' => $createdAt,
+                'updated_at' => $updatedAt,
+            ]);
+        }
+
+        // Close the file
+        fclose($handle);
     }
 
     dd("Data imported successfully!");
