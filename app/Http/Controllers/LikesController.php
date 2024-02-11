@@ -41,7 +41,7 @@ class LikesController extends Controller
 
         $likedQuotes = $user->likedQuotes()
             ->with('likedByUsers:id,name')
-            ->get(['quotes.id', 'quotes.content', 'quotes.source', 'quotes.category']); // Prefix 'quotes.'
+            ->get(['quotes.id', 'quotes.content', 'quotes.source']);
 
         return response()->json($likedQuotes);
     }
