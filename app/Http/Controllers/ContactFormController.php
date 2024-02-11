@@ -24,6 +24,8 @@ class ContactFormController extends Controller
 
             Mail::to('hafizzeeshan619@gmail.com')->send(new ContactFormMail($data));
 
+            \Log::info("You received an email from {$data['email']}");
+
             return response()->json(['success' => true, 'message' => 'Thank you for contacting us!']);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
