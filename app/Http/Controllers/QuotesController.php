@@ -12,16 +12,23 @@ class QuotesController extends Controller
     public function index(Request $request)
     {
         $page = $request->get('page', 1);
-        $category = $request->get('category');
+        $categoryName = $request->get('category');
+
         $pageSize = 10;
-        //sleep(1);
-        $quotes = Quote::withCount('likedByUsers')
-            ->orderBy('id', 'desc')
-            ->skip(($page - 1) * $pageSize)->take($pageSize)->get();
+
+        $quotesQuery = Quote::withCount('likedByUsers')
+            ->orderBy('id', 'desc');
+
+        $quotesQuery = $quotesQuery->whereHas('category', function ($query) use ($categoryName) {
+            $query->where('name', $categoryName);
+        });
+
+        $quotes = $quotesQuery->skip(($page - 1) * $pageSize)
+            ->take($pageSize)
+            ->get();
 
         // If the user is authenticated, augment each quote with the isLikedByUser property
         if (Auth::check()) {
-
             $likedQuoteIds = Auth::user()->likedQuotes()->pluck('quotes.id')->toArray();
 
             $quotes->transform(function ($quote) use ($likedQuoteIds) {
@@ -32,6 +39,7 @@ class QuotesController extends Controller
 
         return $quotes;
     }
+
 
     public function show($quoteId)
     {
