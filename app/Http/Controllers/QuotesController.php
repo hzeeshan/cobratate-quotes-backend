@@ -17,7 +17,7 @@ class QuotesController extends Controller
         $pageSize = 10;
 
         $quotesQuery = Quote::withCount('likedByUsers')
-            ->orderBy('id', 'desc');
+            ->orderBy('id', 'asc');
 
         $quotesQuery = $quotesQuery->whereHas('category', function ($query) use ($categoryName) {
             $query->where('name', $categoryName);
